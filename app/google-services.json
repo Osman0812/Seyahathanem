@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "478540428319",
+    "project_id": "seyahathanem-ebad3",
+    "storage_bucket": "seyahathanem-ebad3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:478540428319:android:bfa598a16e4fa89fccd12a",
+        "android_client_info": {
+          "package_name": "com.example.mezunproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "478540428319-6ot931r9cf8h06llciu7qfjk4bk7loe6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfXYFSFwnUrMGJ_J2RnIb7GqcQ53gxv-w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "478540428319-6ot931r9cf8h06llciu7qfjk4bk7loe6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

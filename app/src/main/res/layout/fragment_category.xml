@@ -1,0 +1,231 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.example.seyahathanem.fragments.CategoryFragment">
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize">
+
+
+
+            <ImageView
+                android:id="@+id/back_pressed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+
+                android:src="@drawable/quantum_ic_arrow_back_grey600_24"
+
+                android:padding="15dp">
+
+            </ImageView>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+
+
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/quantum_ic_search_grey600_24"
+                android:padding="15dp">
+
+            </ImageView>
+
+
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Categories"
+            android:textSize="30sp"
+            android:fontFamily="sans-serif-black"
+            android:textAllCaps="true"
+            android:padding="10dp">
+
+        </TextView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/Restaurants"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            app:cardBackgroundColor="#00000000"
+            app:cardElevation="8dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+
+                android:background="@drawable/food_back">
+
+                <ImageView
+                    android:id="@+id/restaurantsImage"
+                    android:layout_width="120dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="20dp"
+                    android:src="@drawable/restaurant">
+
+
+                </ImageView>
+
+                <TextView
+                    android:id="@+id/categoryNameRestaurants"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:padding="25dp"
+                    android:text="Restaurants"
+                    android:textColor="@color/quantum_white_100"
+                    android:textSize="30sp">
+
+                </TextView>
+
+            </RelativeLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="190dp">
+
+            <RelativeLayout
+                android:id="@+id/Cars"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/round_bk2">
+
+                <TextView
+                    android:id="@+id/categoryNameCars"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="25dp"
+                    android:text="Cars"
+                    android:textColor="@color/black"
+                    android:textSize="30sp">
+
+                </TextView>
+
+
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/carsImage"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="-40dp"
+                android:src="@drawable/car">
+
+            </ImageView>
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/Entertainment"
+
+            android:layout_width="match_parent"
+            android:layout_height="190dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/round_bk5">
+
+                <TextView
+                    android:id="@+id/categoryNameEntertainment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="25dp"
+                    android:text="Entertainment"
+                    android:textColor="@color/black"
+                    android:textSize="30sp">
+
+                </TextView>
+
+
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/entertainmentImage"
+                android:layout_width="130dp"
+                android:layout_height="90dp"
+                android:src="@drawable/movies"
+                android:layout_marginTop="5dp"
+                android:layout_alignParentRight="true">
+
+            </ImageView>
+
+
+        </RelativeLayout>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="#00000000"
+            app:cardElevation="8dp"
+            android:layout_margin="20dp">
+
+            <RelativeLayout
+                android:id="@+id/Shopping"
+
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+
+                android:background="@drawable/food_back">
+
+                <ImageView
+                    android:id="@+id/imageShopping"
+                    android:layout_width="120dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="20dp"
+                    android:src="@drawable/categories_shop_icon">
+
+
+                </ImageView>
+
+                <TextView
+                    android:id="@+id/categoryNameShpping"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:padding="25dp"
+                    android:text="Shopping"
+                    android:textColor="@color/quantum_white_100"
+                    android:textSize="30sp">
+
+                </TextView>
+
+            </RelativeLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+    </LinearLayout>
+
+
+
+
+
+</ScrollView>
