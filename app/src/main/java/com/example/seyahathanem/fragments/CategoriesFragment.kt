@@ -6,9 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.GridView
+import android.widget.Toast
 import com.example.mezunproject.R
-import com.example.mezunproject.databinding.FragmentAddPlaceBinding
 import com.example.mezunproject.databinding.FragmentCategoriesBinding
+import com.example.seyahathanem.adapters.GridRVAdapter
 import com.example.seyahathanem.viewModel.DataModal
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -27,6 +28,9 @@ class CategoriesFragment : Fragment() {
     private var dataModalArrayList: ArrayList<DataModal> = ArrayList()
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
+    private lateinit var adapter : GridRVAdapter
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,11 +52,40 @@ class CategoriesFragment : Fragment() {
         firestore = Firebase.firestore
         auth = Firebase.auth
 
+        getDataFromFirebase()
+
+        adapter = GridRVAdapter(dataModalArrayList,requireContext())
+        gridView.adapter = adapter
+
+
+
     }
 
-    private fun getDataFromFirebase(cName : String) {
+    private fun getDataFromFirebase() {
 
 
+        firestore.collection("Users").document(auth.currentUser!!.email.toString())
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    Toast.makeText(requireContext(), error.message, Toast.LENGTH_LONG).show()
+                } else {
+                    if (value != null) {
+                        val collections = value.get("collections") as ArrayList<*>
+
+                        dataModalArrayList.clear()
+                        for (collection in collections) {
+                            //getDataFromFirebase(collection)
+                            val data = DataModal(collection.toString())
+                            dataModalArrayList.add(data)
+
+
+
+                        }
+                        adapter.notifyDataSetChanged()
+
+                    }
+                }
+            }
 
     }
 

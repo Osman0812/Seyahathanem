@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        changeFragmentTo(SocialFragment())
+        changeFragmentTo(CategoriesFragment())
 
         bottomNav = binding.bottomNavigationView.findViewById(R.id.bottomNavigationView)
 
@@ -76,14 +76,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun getDataFromFirebase(){
 
-
-        firestore.collection("Users").document(auth.currentUser!!.email.toString())
-
-
-
-    }
 
 
     private fun changeFragmentTo(fragment : Fragment){
