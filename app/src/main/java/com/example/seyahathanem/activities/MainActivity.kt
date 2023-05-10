@@ -3,23 +3,34 @@ package com.example.seyahathanem.activities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.example.mezunproject.R
 import com.example.mezunproject.databinding.ActivityMainBinding
+import com.example.seyahathanem.fragments.AddPlaceFragmentArgs
 import com.example.seyahathanem.fragments.CategoriesFragment
 import com.example.seyahathanem.fragments.MapsFragment
 import com.example.seyahathanem.fragments.SocialFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityMainBinding
     private lateinit var bottomNav : BottomNavigationView
+    private lateinit var firestore : FirebaseFirestore
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        val view = binding.root
+        setContentView(view)
 
         changeFragmentTo(SocialFragment())
 
@@ -27,6 +38,17 @@ class MainActivity : AppCompatActivity() {
 
         bottomNav.selectedItemId = R.id.home
 
+        auth = Firebase.auth
+        firestore = Firebase.firestore
+
+        // From add place done successfully
+        val from = intent.getStringExtra("from")
+        if (from.equals("fromAddPlaceFragment")){
+
+            val fragmentManager = supportFragmentManager
+            fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            Toast.makeText(applicationContext,"Saved Successfully!", Toast.LENGTH_LONG).show()
+        }
 
         bottomNav.setOnItemSelectedListener {
 
@@ -53,6 +75,16 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
+    private fun getDataFromFirebase(){
+
+
+        firestore.collection("Users").document(auth.currentUser!!.email.toString())
+
+
+
+    }
+
 
     private fun changeFragmentTo(fragment : Fragment){
 

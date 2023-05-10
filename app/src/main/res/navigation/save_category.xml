@@ -23,6 +23,10 @@
             app:argType="string"
             app:nullable="true"
             android:defaultValue="null" />
+        <action
+
+            android:id="@+id/action_addPlaceFragment_to_mainActivity"
+            app:destination="@id/mainActivity" />
     </fragment>
     <fragment
         android:id="@+id/categoryFragment"
@@ -33,4 +37,14 @@
             android:id="@+id/action_categoryFragment_to_addPlaceFragment"
             app:destination="@id/addPlaceFragment" />
     </fragment>
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="com.example.seyahathanem.activities.MainActivity"
+        android:label="activity_main"
+        tools:layout="@layout/activity_main" >
+        <argument
+            android:name="finish"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </activity>
 </navigation>

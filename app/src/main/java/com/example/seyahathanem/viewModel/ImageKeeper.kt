@@ -10,7 +10,6 @@ class ImageKeeper() : ViewModel() {
     var placeName : String? = null
     var selectedCategoryBitmap : Bitmap? = null
     var imageUri : Uri? = null
-
-
+    var comment: String? = null
 
 }

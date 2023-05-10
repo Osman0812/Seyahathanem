@@ -23,11 +23,13 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.example.mezunproject.databinding.FragmentAddPlaceBinding
+import com.example.seyahathanem.activities.MainActivity
 import com.example.seyahathanem.viewModel.ImageKeeper
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -82,12 +84,14 @@ class AddPlaceFragment : Fragment() {
             binding.placeNameText.setText(placeName)
         }
 
-
-
         placeName = viewModel.placeName
         val imageFromViewModel = viewModel.imageUri
         if (imageFromViewModel != null){
             binding.profilePhoto.setImageURI(imageFromViewModel)
+        }
+        val comment = viewModel.comment
+        if (comment != null){
+            binding.commentText.setText(comment)
         }
         val imgCategory = viewModel.selectedImageBitmap
         if (imgCategory!= null){
@@ -99,15 +103,20 @@ class AddPlaceFragment : Fragment() {
             binding.placeNameText.setText(placeName)
         }
 
-
         binding.profilePhoto.setOnClickListener {
 
             selectProfilePhoto(it)
         }
+
         binding.save.setOnClickListener {
 
-            saveToFirebase()
-
+            val isOK = saveToFirebase()
+            if (isOK == 0){
+                val intent = Intent(requireContext(),MainActivity::class.java)
+                intent.putExtra("from","fromAddPlaceFragment")
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                startActivity(intent)
+            }
         }
         binding.categoryPhoto.setOnClickListener {
 
@@ -116,16 +125,11 @@ class AddPlaceFragment : Fragment() {
 
         }
 
-
-
         val data = getDataFromCategory()
         if (data != "null" ){
             val byteArray = android.util.Base64.decode(data,android.util.Base64.DEFAULT)
             setCategoryImage(byteArray)
         }
-
-
-
 
     }
 
@@ -222,56 +226,65 @@ class AddPlaceFragment : Fragment() {
 
     }
 
-    private fun saveToFirebase(){
+    private fun saveToFirebase(): Int{
 
         val uuid = UUID.randomUUID()
         val imageName = "$uuid.jpg"
 
         val intent = requireActivity().intent
-        val placeName = intent.getStringExtra("placeName")
+        var placeName = intent.getStringExtra("placeName")
         val comment = binding.commentText.text.toString()
         val cName = sharedPreferences.getString("cName",null)
         selectedPicture = viewModel.imageUri
         val reference = storage.reference
+        if (placeName == null){
+            placeName = binding.placeNameText.text.toString()
+        }
 
 
         val hashMap = hashMapOf<String,Any>()
 
-        if (placeName != null && cName != null){
+        if (placeName.isNotEmpty() && cName != "null"){
 
 
-            hashMap.put("category",cName)
-            hashMap.put("placeName",placeName)
-            hashMap.put("comment",comment)
-            hashMap.put("date",Timestamp.now())
+            hashMap["category"] = cName.toString()
+            hashMap["placeName"] = placeName
+            hashMap["comment"] = comment
+            hashMap["date"] = Timestamp.now()
 
-            firestore.collection("Users").document(auth.currentUser!!.email.toString()).collection(cName).document(imageName).set(hashMap).addOnSuccessListener {
-                Toast.makeText(requireContext(),"Succeed!",Toast.LENGTH_LONG).show()
+            firestore.collection("Users").document(auth.currentUser!!.email.toString()).collection(cName!!).document(imageName).set(hashMap).addOnSuccessListener {
+
+                val ref = firestore.collection("Users").document(auth.currentUser!!.email.toString())
+
+                ref.update("collections",FieldValue.arrayUnion(cName.toString()))
             }
+            if (selectedPicture != null){
+                val imageReference = reference.child(cName).child(imageName)
+                imageReference.putFile(selectedPicture!!).addOnSuccessListener {
+                    val uploadPictureReference = storage.reference.child(cName).child(imageName)
+                    uploadPictureReference.downloadUrl.addOnSuccessListener {
+                        val downloadUrl = it.toString()
+                        hashMap["pictureUrl"] = downloadUrl
+
+                        firestore.collection("Users").document(auth.currentUser!!.email.toString()).collection(cName).document(imageName).update(hashMap).addOnSuccessListener {
 
 
-            val imageReference = reference.child(cName).child(imageName)
-            imageReference.putFile(selectedPicture!!).addOnSuccessListener {
-                val uploadPictureReference = storage.reference.child(cName).child(imageName)
-                uploadPictureReference.downloadUrl.addOnSuccessListener {
-                    val downloadUrl = it.toString()
-                    hashMap.put("pictureUrl", downloadUrl)
-                    firestore.collection("Users").document(auth.currentUser!!.email.toString()).collection(cName).document(imageName).update(hashMap).addOnSuccessListener {
 
+                        }
                     }
                 }
             }
 
-
-
         }else{
-            Toast.makeText(requireContext(),"Place Name must be filled!",Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(),"Place name and category sections must be filled !",Toast.LENGTH_LONG).show()
             binding.placeNameText.requestFocus()
+            return -1
         }
-
+        return 0
 
 
     }
+
 
     private fun getDataFromCategory() : String? {
 
@@ -281,19 +294,17 @@ class AddPlaceFragment : Fragment() {
             sharedPreferences.edit().putString("cName",categoryName).apply()
 
             return data
-
-
-
         }
         return ""
 
 
     }
 
-
-
     override fun onDestroyView() {
         super.onDestroyView()
+
+        viewModel.comment = binding.commentText.text.toString()
+
         _binding = null
     }
 
