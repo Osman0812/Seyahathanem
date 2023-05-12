@@ -22,7 +22,7 @@ internal class GridRVAdapter(
     // for layout inflater, course image view and course text view.
     private var layoutInflater: LayoutInflater? = null
     private lateinit var categoryTV: TextView
-    private lateinit var courseIV: ImageView
+    private lateinit var categoryIV: ImageView
 
     // below method is use to return the count of course list
     override fun getCount(): Int {
@@ -40,10 +40,9 @@ internal class GridRVAdapter(
     }
 
     // in below function we are getting individual item of grid view.
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View? {
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View{
         var convertView = convertView
-        // on blow line we are checking if layout inflater
-        // is null, if it is null we are initializing it.
+
         if (layoutInflater == null) {
             layoutInflater =
                 context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -57,12 +56,14 @@ internal class GridRVAdapter(
         }
         // on below line we are initializing our course image view
         // and course text view with their ids.
-        //courseIV = convertView!!.findViewById(R.id.idIVCourse)
-        categoryTV = convertView!!.findViewById(R.id.categoryName)
+        categoryIV = convertView!!.findViewById(R.id.categoryImage)
+        categoryTV = convertView.findViewById(R.id.categoryName)
         // on below line we are setting image for our course image view.
         //courseIV.setImageResource(courseList.get(position).courseImg)
         // on below line we are setting text in our course text view.
         categoryTV.text = courseList.get(position).name
+        categoryIV.setImageResource(courseList.get(position).img)
+
         // at last we are returning our convert view.
         return convertView
     }

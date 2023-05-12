@@ -5,6 +5,7 @@
     tools:context="com.example.seyahathanem.fragments.CategoriesFragment">
 
     <GridView
+        android:background="@color/quantum_bluegrey100"
         android:id="@+id/idGRV"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

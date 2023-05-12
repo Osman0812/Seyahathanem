@@ -233,6 +233,8 @@ class AddPlaceFragment : Fragment() {
 
         val intent = requireActivity().intent
         var placeName = intent.getStringExtra("placeName")
+        val latitude = intent.getDoubleExtra("latitude",0.0)
+        val longitude = intent.getDoubleExtra("longitude",0.0)
         val comment = binding.commentText.text.toString()
         val cName = sharedPreferences.getString("cName",null)
         selectedPicture = viewModel.imageUri
@@ -249,6 +251,8 @@ class AddPlaceFragment : Fragment() {
 
             hashMap["category"] = cName.toString()
             hashMap["placeName"] = placeName
+            hashMap["latitude"] = latitude
+            hashMap["longitude"] = longitude
             hashMap["comment"] = comment
             hashMap["date"] = Timestamp.now()
 

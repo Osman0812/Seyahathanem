@@ -8,11 +8,9 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.net.Uri
 import androidx.fragment.app.Fragment
 
 import android.os.Bundle
@@ -38,16 +36,13 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.model.RectangularBounds
-import com.google.android.libraries.places.api.model.TypeFilter
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Locale
+
 
 class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
 
@@ -231,7 +226,7 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
 
 
                         }
-                        alert(place)
+                        alert(place, selectedLatitude!!, selectedLongitude!!)
 
                     }.addOnFailureListener {
                         Toast.makeText(requireContext(),"Failed to retrieve current place: ${it.message}",Toast.LENGTH_LONG).show()
@@ -246,7 +241,7 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
 
     }
 
-    private fun alert(placeName: String){
+    private fun alert(placeName: String, latitude: Double, longitude: Double){
 
         val alert = AlertDialog.Builder(requireContext())
         alert.setTitle("Save Place")
@@ -257,6 +252,8 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
                 val intent = Intent(requireContext(),AddPlaceActivity::class.java)
                 if (placeName != ""){
                     intent.putExtra("placeName",placeName)
+                    intent.putExtra("latitude",latitude)
+                    intent.putExtra("longitude",longitude)
                 }
                 startActivity(intent)
 
@@ -265,6 +262,7 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
         alert.setNegativeButton("Cancel"){ p0, p1 ->
 
             p0.dismiss()
+            mMap.clear()
         }
         alert.setCancelable(true)
         alert.create()

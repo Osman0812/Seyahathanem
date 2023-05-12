@@ -16,11 +16,12 @@
 
         <ImageView
             android:id="@+id/categoryImage"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_gravity="center"
             android:layout_margin="5dp"
             android:padding="4dp"
+            android:scaleType="fitXY"
             android:src="@mipmap/ic_launcher" />
 
         <TextView
@@ -31,6 +32,7 @@
             android:layout_margin="5dp"
             android:padding="4dp"
             android:text="@string/app_name"
+            android:textSize="25dp"
             android:textAlignment="center"
             android:textColor="@color/black" />
 

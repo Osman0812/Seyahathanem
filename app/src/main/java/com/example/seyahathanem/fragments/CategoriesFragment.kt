@@ -1,14 +1,17 @@
 package com.example.seyahathanem.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.GridView
 import android.widget.Toast
 import com.example.mezunproject.R
 import com.example.mezunproject.databinding.FragmentCategoriesBinding
+import com.example.seyahathanem.activities.CategoryDocuments
 import com.example.seyahathanem.adapters.GridRVAdapter
 import com.example.seyahathanem.viewModel.DataModal
 import com.google.firebase.auth.FirebaseAuth
@@ -29,6 +32,7 @@ class CategoriesFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
     private lateinit var adapter : GridRVAdapter
+    private lateinit var data : DataModal
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +63,24 @@ class CategoriesFragment : Fragment() {
 
 
 
+        gridView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+
+            val selectedCategory = dataModalArrayList[position].name
+            listCategoryDocuments(selectedCategory)
+
+        }
+
     }
+
+
+    private fun listCategoryDocuments(category : String){
+
+        val intent = Intent(requireContext(),CategoryDocuments::class.java)
+        intent.putExtra("cName",category)
+        startActivity(intent)
+
+    }
+
 
     private fun getDataFromFirebase() {
 
@@ -69,13 +90,23 @@ class CategoriesFragment : Fragment() {
                 if (error != null) {
                     Toast.makeText(requireContext(), error.message, Toast.LENGTH_LONG).show()
                 } else {
-                    if (value != null) {
+                    if (value != null && value.contains("collections")) {
                         val collections = value.get("collections") as ArrayList<*>
 
                         dataModalArrayList.clear()
                         for (collection in collections) {
                             //getDataFromFirebase(collection)
-                            val data = DataModal(collection.toString())
+
+                            if (collection.toString() == "Restaurants"){
+                                data = DataModal(collection.toString(),R.drawable.rest)
+                            }else if (collection.toString() == "Entertainment"){
+                                data = DataModal(collection.toString(),R.drawable.movies)
+                            }else if (collection.toString() == "Shopping"){
+                                data = DataModal(collection.toString(),R.drawable.categories_shop_icon)
+                            }else if (collection.toString() == "Cars"){
+                                data = DataModal(collection.toString(),R.drawable.buggatti)
+                            }
+
                             dataModalArrayList.add(data)
 
 
