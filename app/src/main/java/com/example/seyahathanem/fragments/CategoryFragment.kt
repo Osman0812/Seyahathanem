@@ -1,19 +1,31 @@
 package com.example.seyahathanem.fragments
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Base64
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mezunproject.R
 import com.example.mezunproject.databinding.FragmentAddPlaceBinding
 import com.example.mezunproject.databinding.FragmentCategoryBinding
+import com.example.seyahathanem.adapters.NewCategoryAdapter
+import com.example.seyahathanem.classes.NewCategory
 import com.example.seyahathanem.viewModel.ImageKeeper
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
 
 
@@ -28,6 +40,10 @@ class CategoryFragment : Fragment() {
     private  var encodedImage : String ? = null
     private  var categoryName: String? = null
     private lateinit var viewModel: ImageKeeper
+    private lateinit var firestore: FirebaseFirestore
+    private lateinit var auth: FirebaseAuth
+    private lateinit var categoryArrayList : ArrayList<NewCategory>
+    private lateinit var adapter: NewCategoryAdapter
 
 
 
@@ -46,13 +62,19 @@ class CategoryFragment : Fragment() {
         _binding = FragmentCategoryBinding.inflate(inflater, container, false)
         return binding.root
 
-
-
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        auth = Firebase.auth
+        firestore = Firebase.firestore
+        categoryArrayList = ArrayList()
+        getCreatedCategories()
+
+        binding.createdCategoryRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        adapter = NewCategoryAdapter(categoryArrayList)
+        binding.createdCategoryRecyclerView.adapter = adapter
 
 
         binding.Restaurants.setOnClickListener {
@@ -68,6 +90,13 @@ class CategoryFragment : Fragment() {
             categorySelect(binding.entertainmentImage)
             categoryName = binding.categoryNameEntertainment.text.toString()
             actionToAddPlaceFragment(it)
+
+        }
+
+        binding.newCategory.setOnClickListener {
+
+            val action = CategoryFragmentDirections.actionCategoryFragmentToNewCategoryFragment()
+            Navigation.findNavController(it).navigate(action)
 
         }
 
@@ -95,10 +124,7 @@ class CategoryFragment : Fragment() {
 
         }
 
-
         binding.backPressed.setOnClickListener {
-
-
 
             //encodedImage: an image converted to string from byteArray
             //actionToUploadFragment(it)
@@ -114,6 +140,44 @@ class CategoryFragment : Fragment() {
         val action = CategoryFragmentDirections.actionCategoryFragmentToAddPlaceFragment(encodedImage,categoryName)
         Navigation.findNavController(view).navigate(action)
     }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun getCreatedCategories(){
+
+        firestore.collection("Users").document(auth.currentUser!!.email.toString()).collection("createdCategories").addSnapshotListener { value, error ->
+
+            if (error != null){
+                Toast.makeText(requireContext(),error.message,Toast.LENGTH_LONG).show()
+            }else {
+
+                if (value != null && !value.isEmpty){
+
+                    val documents = value.documents
+                    categoryArrayList.clear()
+                    for (document in documents) {
+
+                        val categoryName = document.get("categoryName") as String
+                        val downloadUrl = document.get("downloadUrl") as String
+
+                        val newCategory = NewCategory(categoryName,downloadUrl)
+
+                        categoryArrayList.add(newCategory)
+
+
+                    }
+
+                    adapter.notifyDataSetChanged()
+
+                }
+
+            }
+
+        }
+
+
+    }
+
+
 
     fun bitmapImage(image: Bitmap, maxSize: Int) : Bitmap {
 

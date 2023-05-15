@@ -103,6 +103,13 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
         mMap = p0
         mMap.setOnMapLongClickListener(this)
 
+        // From see selectedPlace Location
+        val mLatitude = arguments?.getDouble(ARG_LATITUDE) ?: 0.0
+        val mLongitude = arguments?.getDouble(ARG_LONGITUDE) ?: 0.0
+        val mLocationLatLng = LatLng(mLatitude, mLongitude)
+
+
+        // Up to here
         locationManager = requireActivity().getSystemService(LOCATION_SERVICE) as LocationManager
         locationListener = object : LocationListener {
             override fun onLocationChanged(location: Location) {
@@ -132,9 +139,17 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
             //permission granted
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0f,locationListener)
             val lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            if (lastLocation != null) {
-                val lastUserLocation = LatLng(lastLocation.latitude,lastLocation.longitude)
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation,17f))
+
+
+            //Control where we came from
+            if (mLongitude != 0.0 && mLatitude != 0.0){
+                mMap.addMarker(MarkerOptions().position(mLocationLatLng))
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLocationLatLng, DEFAULT_ZOOM))
+            }else{
+                if (lastLocation != null) {
+                    val lastUserLocation = LatLng(lastLocation.latitude,lastLocation.longitude)
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation,17f))
+                }
             }
             mMap.isMyLocationEnabled = true
         }
@@ -252,9 +267,9 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
                 val intent = Intent(requireContext(),AddPlaceActivity::class.java)
                 if (placeName != ""){
                     intent.putExtra("placeName",placeName)
-                    intent.putExtra("latitude",latitude)
-                    intent.putExtra("longitude",longitude)
                 }
+                intent.putExtra("latitude",latitude)
+                intent.putExtra("longitude",longitude)
                 startActivity(intent)
 
             }
@@ -269,6 +284,20 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
         alert.show()
 
 
+    }
+    companion object {
+        private const val ARG_LATITUDE = "latitude"
+        private const val ARG_LONGITUDE = "longitude"
+        private const val DEFAULT_ZOOM = 17f
+
+        fun newInstance(latitude: Double, longitude: Double): MapsFragment {
+            val fragment = MapsFragment()
+            val args = Bundle()
+            args.putDouble(ARG_LATITUDE, latitude)
+            args.putDouble(ARG_LONGITUDE, longitude)
+            fragment.arguments = args
+            return fragment
+        }
     }
 
     override fun onDestroyView() {

@@ -106,11 +106,7 @@ class CategoriesFragment : Fragment() {
                             }else if (collection.toString() == "Cars"){
                                 data = DataModal(collection.toString(),R.drawable.buggatti)
                             }
-
                             dataModalArrayList.add(data)
-
-
-
                         }
                         adapter.notifyDataSetChanged()
 

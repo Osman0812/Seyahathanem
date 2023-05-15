@@ -16,11 +16,13 @@ import com.example.seyahathanem.fragments.CategoriesFragment
 import com.example.seyahathanem.fragments.MapsFragment
 import com.example.seyahathanem.fragments.SocialFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
 
@@ -98,8 +100,6 @@ class MainActivity : AppCompatActivity() {
 
         return super.onOptionsItemSelected(item)
     }
-
-
 
 
     private fun changeFragmentTo(fragment : Fragment){

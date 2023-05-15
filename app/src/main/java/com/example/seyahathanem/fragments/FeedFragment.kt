@@ -18,6 +18,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.type.LatLng
 
 class FeedFragment : Fragment() {
 
@@ -61,7 +62,7 @@ class FeedFragment : Fragment() {
         getCategoriesDataFromFirebase(cName.toString())
 
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        adapter = FeedAdapter(categoryList)
+        adapter = FeedAdapter(requireContext(),categoryList)
         binding.recyclerView.adapter = adapter
 
 
@@ -81,16 +82,23 @@ class FeedFragment : Fragment() {
                 if (value != null && !value.isEmpty){
                     val documents = value.documents
 
-                    //categoryList.clear()
+                    categoryList.clear()
                     for (document in documents){
                         var categoryImage : String ? = null
+                        var latitude : Double = 0.0
+                        var longitude : Double = 0.0
 
                         val categoryName = document.get("placeName") as String
                         if (document.contains("pictureUrl")){
                             categoryImage = document.get("pictureUrl") as String
                         }
+                        if (document.contains("latitude") && document.contains("longitude")){
+                            latitude = document.get("latitude") as Double
+                            longitude = document.get("longitude") as Double
+                        }
 
-                        val place = FeedScreenClass(categoryImage,categoryName)
+
+                        val place = FeedScreenClass(categoryImage,categoryName,latitude,longitude)
                         categoryList.add(place)
 
                     }

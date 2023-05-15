@@ -36,6 +36,9 @@
         <action
             android:id="@+id/action_categoryFragment_to_addPlaceFragment"
             app:destination="@id/addPlaceFragment" />
+        <action
+            android:id="@+id/action_categoryFragment_to_newCategoryFragment"
+            app:destination="@id/newCategoryFragment" />
     </fragment>
     <activity
         android:id="@+id/mainActivity"
@@ -47,4 +50,13 @@
             app:argType="boolean"
             android:defaultValue="false" />
     </activity>
+    <fragment
+        android:id="@+id/newCategoryFragment"
+        android:name="com.example.seyahathanem.fragments.NewCategoryFragment"
+        android:label="fragment_new_category"
+        tools:layout="@layout/fragment_new_category" >
+        <action
+            android:id="@+id/action_newCategoryFragment_to_categoryFragment"
+            app:destination="@id/categoryFragment" />
+    </fragment>
 </navigation>
