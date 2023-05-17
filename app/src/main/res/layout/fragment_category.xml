@@ -13,38 +13,6 @@
         android:layout_margin="8dp"
         android:orientation="vertical">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="?actionBarSize">
-
-
-
-            <ImageView
-                android:id="@+id/back_pressed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-
-                android:src="@drawable/quantum_ic_arrow_back_grey600_24"
-
-                android:padding="15dp">
-
-            </ImageView>
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-
-
-                android:layout_alignParentEnd="true"
-                android:src="@drawable/quantum_ic_search_grey600_24"
-                android:padding="15dp">
-
-            </ImageView>
-
-
-        </RelativeLayout>
 
         <TextView
             android:layout_width="wrap_content"

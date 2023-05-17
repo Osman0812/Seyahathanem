@@ -32,8 +32,6 @@ import java.io.ByteArrayOutputStream
 class CategoryFragment : Fragment() {
 
     private var _binding: FragmentCategoryBinding? = null
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
     private lateinit var bitmap: Bitmap
     private lateinit var stream: ByteArrayOutputStream
@@ -115,7 +113,7 @@ class CategoryFragment : Fragment() {
             actionToAddPlaceFragment(it)
         }
 
-
+/*
 
         binding.backPressed.setOnClickListener {
 
@@ -124,15 +122,8 @@ class CategoryFragment : Fragment() {
 
         }
 
-        binding.backPressed.setOnClickListener {
 
-            //encodedImage: an image converted to string from byteArray
-            //actionToUploadFragment(it)
-            val action = CategoryFragmentDirections.actionCategoryFragmentToAddPlaceFragment()
-            Navigation.findNavController(it).navigate(action)
-
-
-        }
+ */
     }
 
     private fun actionToAddPlaceFragment(view: View){

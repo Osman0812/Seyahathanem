@@ -54,7 +54,6 @@ class MainActivity : AppCompatActivity() {
             fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
             Toast.makeText(applicationContext,"Saved Successfully!", Toast.LENGTH_LONG).show()
         }
-
         bottomNav.setOnItemSelectedListener {
 
             when (it.itemId){

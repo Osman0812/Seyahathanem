@@ -249,6 +249,7 @@ class AddPlaceFragment : Fragment() {
         if (placeName.isNotEmpty() && cName != "null"){
 
 
+            hashMap["id"] = imageName
             hashMap["category"] = cName.toString()
             hashMap["placeName"] = placeName
             hashMap["latitude"] = latitude

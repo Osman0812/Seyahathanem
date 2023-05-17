@@ -24,8 +24,6 @@ import com.google.firebase.ktx.Firebase
 class CategoriesFragment : Fragment() {
 
     private var _binding: FragmentCategoriesBinding? = null
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
     private lateinit var gridView: GridView
     private var dataModalArrayList: ArrayList<DataModal> = ArrayList()
@@ -59,7 +57,15 @@ class CategoriesFragment : Fragment() {
         getDataFromFirebase()
 
         adapter = GridRVAdapter(dataModalArrayList,requireContext())
+
+
+
         gridView.adapter = adapter
+
+        if (adapter.count == 0){
+            binding.idGRV.visibility = View.GONE
+            binding.emptyTextView.visibility = View.VISIBLE
+        }
 
 
 
