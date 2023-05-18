@@ -270,7 +270,8 @@ class ProfileActivity : AppCompatActivity() {
                     Picasso.get().load(profilePictureString).into(binding.imageView)
                     //binding.imageView.setImageURI(selectedPicture)
                 }else{
-                    Picasso.get().load(R.drawable.profilephoto).into(binding.imageView)
+                   // Picasso.get().load(R.drawable.noimg).into(binding.imageView)
+                    binding.imageView.setImageResource(R.drawable.profilephoto)
                 }
 
 

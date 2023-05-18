@@ -2,4 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.seyahathanem.fragments.SocialFragment"/>
+    tools:context="com.example.seyahathanem.fragments.SocialFragment">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/socialRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</FrameLayout>
