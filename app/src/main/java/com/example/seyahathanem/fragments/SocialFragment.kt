@@ -2,12 +2,18 @@ package com.example.seyahathanem.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.TextUtils
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import android.widget.Toast
+import androidx.core.view.MenuItemCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.mezunproject.R
 import com.example.mezunproject.databinding.FragmentSocialBinding
 import com.example.seyahathanem.adapters.SocialAdapter
 import com.example.seyahathanem.classes.ShareClass
@@ -20,18 +26,18 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 
 
-class SocialFragment : Fragment() {
+class SocialFragment : Fragment(){
 
     private lateinit var auth : FirebaseAuth
     private lateinit var firestore : FirebaseFirestore
     private lateinit var storage: FirebaseStorage
     private lateinit var usersAdapter : SocialAdapter
     private lateinit var usersList : ArrayList<ShareClass>
-
     private var _binding: FragmentSocialBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setHasOptionsMenu(true)
         super.onCreate(savedInstanceState)
     }
 
@@ -59,7 +65,7 @@ class SocialFragment : Fragment() {
         usersAdapter = SocialAdapter(usersList)
         binding.socialRecyclerView.adapter = usersAdapter
 
-        usersList.clear()
+
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -114,11 +120,48 @@ class SocialFragment : Fragment() {
 
     }
 
+    @Deprecated("Deprecated in Java")
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        inflater.inflate(R.menu.search_view,menu)
+
+
+        val item = menu.findItem(R.id.action_search)
+        val searchView = MenuItemCompat.getActionView(item) as SearchView
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+
+                searchUsers(newText!!)
+                return false
+            }
+
+        })
+
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun searchUsers(query: String){
+        val filteredList = usersList.filter { it.name.contains(query,ignoreCase = true) }
+        usersAdapter = SocialAdapter(filteredList as ArrayList<ShareClass>)
+        binding.socialRecyclerView.adapter = usersAdapter
+        usersAdapter.notifyDataSetChanged()
+
+    }
+
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
 
 
 }

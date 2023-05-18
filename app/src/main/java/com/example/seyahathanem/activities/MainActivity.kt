@@ -64,7 +64,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.social -> {
 
+
                     changeFragmentTo(SocialFragment())
+
+
 
                 }
                 R.id.map -> {
