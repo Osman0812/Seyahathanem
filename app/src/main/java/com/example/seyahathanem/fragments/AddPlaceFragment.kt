@@ -41,8 +41,6 @@ import java.util.UUID
 class AddPlaceFragment : Fragment() {
 
     private var _binding: FragmentAddPlaceBinding? = null
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     var selectedPicture : Uri? = null
