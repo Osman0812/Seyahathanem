@@ -62,10 +62,7 @@ class CategoriesFragment : Fragment() {
 
         gridView.adapter = adapter
 
-        if (adapter.count == 0){
-            binding.idGRV.visibility = View.GONE
-            binding.emptyTextView.visibility = View.VISIBLE
-        }
+
 
 
 
