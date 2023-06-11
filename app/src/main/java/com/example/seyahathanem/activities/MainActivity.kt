@@ -1,6 +1,9 @@
 package com.example.seyahathanem.activities
 
+import android.app.AlertDialog
 import android.content.Intent
+import android.content.SharedPreferences
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -15,10 +18,13 @@ import com.example.seyahathanem.fragments.AddPlaceFragmentArgs
 import com.example.seyahathanem.fragments.CategoriesFragment
 import com.example.seyahathanem.fragments.MapsFragment
 import com.example.seyahathanem.fragments.SocialFragment
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.common.collect.Maps
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -30,12 +36,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomNav : BottomNavigationView
     private lateinit var firestore : FirebaseFirestore
     private lateinit var auth: FirebaseAuth
+    private lateinit var sharedPreferences : SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+
 
         changeFragmentTo(CategoriesFragment())
 
@@ -45,6 +53,9 @@ class MainActivity : AppCompatActivity() {
 
         auth = Firebase.auth
         firestore = Firebase.firestore
+        sharedPreferences = getSharedPreferences("com.example.seyahathanem",
+            MODE_PRIVATE)
+        //checkFriendRequests()
 
         // From add place done successfully
         val from = intent.getStringExtra("from")
@@ -81,6 +92,14 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
+        val once = sharedPreferences.getBoolean("once",false)
+        if (!once){
+            checkFriendRequests()
+        }
+
+
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -99,6 +118,7 @@ class MainActivity : AppCompatActivity() {
         }
         if (item.itemId == R.id.logout){
             auth.signOut()
+            sharedPreferences.edit().clear().apply()
             val intent = Intent(this,LoginActivity::class.java)
             startActivity(intent)
             finish()
@@ -106,6 +126,57 @@ class MainActivity : AppCompatActivity() {
 
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun checkFriendRequests(){
+
+        sharedPreferences.edit().putBoolean("once",true).apply()
+        firestore.collection("Users").document(auth.currentUser!!.email.toString()).addSnapshotListener { value, error ->
+            if (value != null){
+                if (value.contains("request")){
+                    val alert = AlertDialog.Builder(this)
+                    val requestEmail = value.get("request") as String
+                    if (requestEmail.isNotEmpty()){
+                        alert.setMessage("Friend request from $requestEmail")
+                        alert.setPositiveButton("Accept") {_,_ ->
+
+                            val hashMap = hashMapOf<String,Any>()
+                            val ezMap = hashMapOf<String,Any>()
+                            hashMap.put("email",requestEmail)
+                            firestore.collection("Users").document(auth.currentUser!!.email.toString()).collection("Friends").document(requestEmail).set(hashMap).addOnSuccessListener {
+                                Toast.makeText(this,"$requestEmail is your friend now",Toast.LENGTH_LONG).show()
+                            }
+                            ezMap.put("email",auth.currentUser!!.email.toString())
+                            firestore.collection("Users").document(requestEmail).collection("Friends").document(auth.currentUser!!.email.toString()).set(ezMap)
+                            val deleteMap = hashMapOf<String,Any>("request" to FieldValue.delete())
+
+                            firestore.collection("Users").document(auth.currentUser!!.email.toString()).update(deleteMap)
+
+                        }
+                        alert.setNegativeButton("Decline") { dialog, _ ->
+                            dialog.dismiss()
+                            val hashMap = hashMapOf<String,Any>("request" to FieldValue.delete())
+
+                            firestore.collection("Users").document(auth.currentUser!!.email.toString()).update(hashMap).addOnSuccessListener {
+                                Toast.makeText(this,"Rejected",Toast.LENGTH_LONG).show()
+                            }
+
+                        }
+                        alert.setOnCancelListener {
+                            it.dismiss()
+                        }
+
+                        alert.show()
+
+                    }
+
+
+                }
+            }
+
+        }
+
+
     }
 
 

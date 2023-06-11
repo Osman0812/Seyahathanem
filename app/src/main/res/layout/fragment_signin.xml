@@ -33,6 +33,7 @@
 
     <EditText
         android:id="@+id/passwordtext"
+        android:inputType="textPassword"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="44dp"
@@ -40,7 +41,6 @@
         android:layout_marginBottom="23dp"
         android:ems="10"
         android:hint="Password"
-        android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/signin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -90,13 +90,15 @@ class CategoryFragment : Fragment() {
             actionToAddPlaceFragment(it)
 
         }
-
+/*
         binding.newCategory.setOnClickListener {
 
             val action = CategoryFragmentDirections.actionCategoryFragmentToNewCategoryFragment()
             Navigation.findNavController(it).navigate(action)
 
         }
+
+ */
 
         binding.Cars.setOnClickListener {
 

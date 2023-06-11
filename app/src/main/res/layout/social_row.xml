@@ -26,12 +26,12 @@
 
     </TextView>
     <ImageView
-        android:id="@+id/msg"
+        android:id="@+id/add_friend"
         android:layout_marginTop="83dp"
         android:layout_marginStart="365dp"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:src="@drawable/message">
+        android:src="@drawable/add_friend">
 
     </ImageView>
 
@@ -41,6 +41,7 @@
         android:layout_height="30dp"
         android:layout_marginTop="82dp"
         android:layout_marginStart="330dp"
+        android:visibility="invisible"
 
         android:src="@drawable/ic_location" />
 

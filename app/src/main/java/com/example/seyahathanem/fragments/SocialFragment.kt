@@ -1,6 +1,9 @@
 package com.example.seyahathanem.fragments
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.TextUtils
 import androidx.fragment.app.Fragment
@@ -19,6 +22,7 @@ import com.example.seyahathanem.adapters.SocialAdapter
 import com.example.seyahathanem.classes.ShareClass
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -34,6 +38,7 @@ class SocialFragment : Fragment(){
     private lateinit var usersAdapter : SocialAdapter
     private lateinit var usersList : ArrayList<ShareClass>
     private var _binding: FragmentSocialBinding? = null
+    lateinit var sharedPreferences: SharedPreferences
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,14 +61,18 @@ class SocialFragment : Fragment(){
         firestore = Firebase.firestore
         storage = Firebase.storage
 
+        sharedPreferences = requireActivity().getSharedPreferences("com.example.seyahathanem",Context.MODE_PRIVATE)
         usersList = ArrayList<ShareClass>()
 
         getDataFromFirebase()
-
+        usersList.size
 
         binding.socialRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        usersAdapter = SocialAdapter(usersList)
+        usersAdapter = SocialAdapter(requireContext(),usersList)
         binding.socialRecyclerView.adapter = usersAdapter
+
+
+
 
 
     }
@@ -120,6 +129,10 @@ class SocialFragment : Fragment(){
 
     }
 
+
+
+
+
     @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
@@ -148,7 +161,7 @@ class SocialFragment : Fragment(){
     @SuppressLint("NotifyDataSetChanged")
     private fun searchUsers(query: String){
         val filteredList = usersList.filter { it.name.contains(query,ignoreCase = true) }
-        usersAdapter = SocialAdapter(filteredList as ArrayList<ShareClass>)
+        usersAdapter = SocialAdapter(requireContext(),filteredList as ArrayList<ShareClass>)
         binding.socialRecyclerView.adapter = usersAdapter
         usersAdapter.notifyDataSetChanged()
 

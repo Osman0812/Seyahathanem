@@ -49,17 +49,21 @@ class Signup : Fragment() {
 
         binding.createAccount.setOnClickListener {
 
-            createUser()
-            uploadToStorage()
+            val ok = createUser()
+            if (ok != -1){
+                uploadToStorage()
+            }
+
         }
 
 
     }
 
-    private fun createUser(){
+    private fun createUser():Int{
 
         if (binding.signupEmailText.text.isEmpty() || binding.passwordText.text.isEmpty()){
             Toast.makeText(context,"Enter Email and Password!", Toast.LENGTH_LONG).show()
+            return -1
         }else{
             auth.createUserWithEmailAndPassword(binding.signupEmailText.text.toString(), binding.passwordText.text.toString()).addOnSuccessListener {
 
@@ -71,9 +75,11 @@ class Signup : Fragment() {
             }.addOnFailureListener {
                 Toast.makeText(context,it.message, Toast.LENGTH_LONG).show()
             }
+            return 0
 
 
         }
+
 
 
     }
