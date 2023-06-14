@@ -11,6 +11,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapShader
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Shader
@@ -32,6 +33,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.NumberPicker
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -50,12 +52,14 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polygon
+import com.google.android.gms.maps.model.PolygonOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -67,7 +71,9 @@ import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.lang.Exception
 import java.util.Calendar
@@ -97,6 +103,11 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
     // initialize this with actual mapping of friend's emails to names
     val friendsMap: HashMap<String, String> = hashMapOf("friend1@example.com" to "Friend 1", "friend2@example.com" to "Friend 2")
     var selectedFriends: BooleanArray = BooleanArray(friendsMap.size) { false }  // initially none selected
+    private var rectangle: Polygon? = null
+    private var southWest: LatLng? = null
+    private var northEast: LatLng? = null
+    var buttonClicked = false
+    var spatialQueryJob: Job? = null
 
 
 
@@ -131,6 +142,7 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
             showCategoryDialog()
         }
 
+        binding.cancel.visibility = View.INVISIBLE
         Places.initialize(requireContext(),"AIzaSyCofjcj7zf41IWDl6DoeL9UzV-BYyR0Gd8")
 
         iconsList = ArrayList()
@@ -226,7 +238,67 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
         //mySharedLocations()
 
 
+    }
+    private suspend fun spatialQuery() = suspendCancellableCoroutine<Unit>{ cont->
+        binding.cancel.setOnClickListener {
+            mMap.clear()
+            binding.cancel.visibility = View.INVISIBLE
+            spatialQueryJob?.cancel()
 
+            // Replace the current fragment with a new instance of it
+            parentFragmentManager.beginTransaction().replace(
+                R.id.fragmentMaps,  // The id of the FrameLayout where your fragment is displayed
+                MapsFragment()  // A new instance of your fragment
+            ).commit()
+        }
+        buttonClicked = true
+        mMap.setOnMapClickListener { point ->
+            // Clear the map
+            mMap.clear()
+
+            if (southWest == null) {
+                // If southWest is null, this is the first click, so we set southWest to the point
+                southWest = point
+
+
+            } else if (northEast == null) {
+                // If southWest is not null but northEast is, this is the second click, so we set northEast to the point
+                northEast = point
+
+                // Remove the old rectangle
+                rectangle?.remove()
+
+                // Draw a rectangle with southWest and northEast as corners
+                rectangle = mMap.addPolygon(
+                    PolygonOptions()
+                        .add(southWest, LatLng(southWest!!.latitude, northEast!!.longitude), northEast, LatLng(northEast!!.latitude, southWest!!.longitude))
+                        .strokeColor(Color.RED)
+                )
+
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Spatial Query")
+                    .setMessage("Kendi verilerinizi mi yoksa arkadaşlarınızın verilerini mi sorgulamak istersiniz?")
+                    .setPositiveButton("Kendi verilerim") { _, _ ->
+                        displayUsersFilterDialog()
+                        //displayAllIcons(southWest = southWest, northEast = northEast)
+                    }
+                    .setNegativeButton("Arkadaşlarımın verileri") { _, _ ->
+                        openFriendsSelectionDialog()
+                    }
+                    .show()
+
+
+            } else {
+                // If both southWest and northEast are not null, the user is starting a new rectangle, so we clear everything
+                southWest = null
+                northEast = null
+                rectangle?.remove()
+                rectangle = null
+
+                // Refresh the markers
+                //displayAllIcons()
+            }
+        }
     }
 
     private fun showCategoryDialog() {
@@ -254,8 +326,10 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
         dialog.show()
     }
 
+
     @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear()
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.maps_menu,menu)
     }
@@ -266,6 +340,14 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
         if (item.itemId == R.id.filter){
             filterAlert()
 
+        }
+        if (item.itemId == R.id.spatial_query){
+            mMap.clear()
+            binding.cancel.visibility = View.VISIBLE
+            spatialQueryJob?.cancel()
+            spatialQueryJob = CoroutineScope(Dispatchers.Main).launch {
+                spatialQuery()
+            }
         }
 
         return super.onOptionsItemSelected(item)
@@ -333,6 +415,32 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
             .setNegativeButton("Cancel", null)
             .show()
     }
+    private fun displayUsersFilterDialog() {
+        val filterOptions = arrayOf("Last 5 days", "Last 10 days", "Last 15 days", "All posts")
+        var selectedOption = 0
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Select filter option")
+            .setSingleChoiceItems(filterOptions, selectedOption) { _, which ->
+                selectedOption = which
+            }
+            .setPositiveButton("OK") { _, _ ->
+                val days: Int? = when (selectedOption) {
+                    0 -> 5
+                    1 -> 10
+                    2 -> 15
+                    else -> null
+                }
+                if (days == null){
+                    displayAllIcons(days)
+                }else{
+                    displayAllIcons(null,null,null,days)
+                }
+
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
 
     private fun displayFilterDialog(selectedFriends: List<String>) {
         val filterOptions = arrayOf("Last 5 days", "Last 10 days", "Last 15 days", "All posts")
@@ -361,7 +469,7 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
             .show()
     }
 
-    private fun displayAllIcons(type: String? = null) {
+    private fun displayAllIcons(type: String? = null, southWest: LatLng? = null, northEast: LatLng? = null, days: Int? = null) {
         val ref = firestore.collection("Users").document(auth.currentUser!!.email.toString())
         ref.addSnapshotListener { value, error ->
             if (value != null) {
@@ -372,8 +480,15 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
                         var query: Query = ref.collection(collection.toString())
                         if (type != null){
                             query = query.whereEqualTo("category", type)
-
                         }
+
+                        // If days is not null, filter documents by date
+                        if (days != null) {
+                            val startDate = Calendar.getInstance()
+                            startDate.add(Calendar.DAY_OF_MONTH, -days)
+                            query = query.whereGreaterThanOrEqualTo("date", startDate.time)
+                        }
+
                         query.addSnapshotListener { v, e ->
                             if (v != null) {
                                 val sharedData = v.documents
@@ -383,6 +498,13 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
                                     val latLng = LatLng(latitude, longitude)
                                     val name = shared.get("placeName") as String
                                     val comment = shared.get("comment") as String
+
+                                    // Check if this location is within the selected area
+                                    if (southWest != null && northEast != null) {
+                                        if (latitude !in southWest.latitude..northEast.latitude || longitude !in southWest.longitude..northEast.longitude) {
+                                            continue
+                                        }
+                                    }
 
                                     val markerOptions = MarkerOptions().position(latLng).title(name).snippet(comment)
 
@@ -408,6 +530,8 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
             }
         }
     }
+
+
     private suspend fun getBitmapDescriptorFromUrl(url: String, desiredSize: Int): BitmapDescriptor? {
         return try {
             val bitmap = Picasso.get().load(url).get()
@@ -417,6 +541,9 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
             null
         }
     }
+
+
+
     private fun fetchFriendLocations(filter: Boolean, days: Int?, selectedFriendsEmails: List<String>?) {
         val userRef = firestore.collection("Users")
         userRef.document(auth.currentUser!!.email.toString()).collection("Friends").get()

@@ -16,7 +16,6 @@
 
     </item>
 
-
     <item
         android:id="@+id/social"
         android:icon="@drawable/people_icon"

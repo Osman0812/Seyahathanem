@@ -14,6 +14,7 @@ import com.example.mezunproject.databinding.FeedRowBinding
 import com.example.seyahathanem.activities.MainActivity
 import com.example.seyahathanem.classes.FeedScreenClass
 import com.example.seyahathanem.classes.SwipeToDeleteCallback
+import com.example.seyahathanem.fragments.ExploreFragment
 import com.example.seyahathanem.fragments.MapsFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -88,7 +89,6 @@ class FeedAdapter (private val recyclerView: RecyclerView,private val context: C
                 .commit()
 
         }
-
 
 
 

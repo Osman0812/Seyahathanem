@@ -1,6 +1,7 @@
 
 <FrameLayout
 
+    android:id="@+id/fragmentMaps"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -35,6 +36,15 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
         android:src="@drawable/people_icon" />
+
+    <Button
+
+        android:id="@+id/cancel"
+        android:layout_marginStart="160dp"
+        android:layout_marginTop="520dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancel" />
 
 </FrameLayout>
 

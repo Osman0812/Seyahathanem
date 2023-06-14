@@ -45,17 +45,9 @@
         android:id="@+id/locationIcon"
         android:layout_width="30dp"
         android:layout_height="30dp"
+        android:layout_marginStart="360dp"
         android:layout_marginTop="82dp"
-        android:layout_marginStart="330dp"
 
         android:src="@drawable/ic_location" />
 
-    <ImageView
-        android:layout_marginTop="83dp"
-        android:layout_marginStart="365dp"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:src="@drawable/share">
-
-    </ImageView>
 </androidx.cardview.widget.CardView>

@@ -7,4 +7,10 @@
 
     </item>
 
+    <item
+        android:title="Spatial Query"
+        android:id="@+id/spatial_query">
+
+    </item>
+
 </menu>
