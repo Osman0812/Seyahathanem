@@ -35,7 +35,47 @@
             android:layout_height="match_parent">
 
         </androidx.recyclerview.widget.RecyclerView>
+        <RelativeLayout
+            android:id="@+id/Museum"
 
+            android:layout_width="match_parent"
+            android:layout_height="190dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/round_bk5">
+
+                <TextView
+                    android:id="@+id/categoryNameMuseum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="25dp"
+                    android:text="Museums"
+                    android:textColor="@color/black"
+                    android:textSize="30sp">
+
+                </TextView>
+
+
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/museumImage"
+                android:layout_width="130dp"
+                android:layout_height="90dp"
+                android:src="@drawable/museum"
+                android:layout_marginTop="5dp"
+                android:layout_alignParentRight="true">
+
+            </ImageView>
+
+
+        </RelativeLayout>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/Restaurants"
@@ -76,6 +116,8 @@
             </RelativeLayout>
 
         </androidx.cardview.widget.CardView>
+
+
 
         <RelativeLayout
             android:layout_width="match_parent"

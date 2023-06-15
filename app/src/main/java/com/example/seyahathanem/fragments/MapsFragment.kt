@@ -53,6 +53,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
@@ -108,6 +109,7 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
     private var northEast: LatLng? = null
     var buttonClicked = false
     var spatialQueryJob: Job? = null
+    private val normalMarkers = mutableListOf<Marker>()
 
 
 
@@ -279,11 +281,11 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
                     .setTitle("Spatial Query")
                     .setMessage("Kendi verilerinizi mi yoksa arkadaşlarınızın verilerini mi sorgulamak istersiniz?")
                     .setPositiveButton("Kendi verilerim") { _, _ ->
-                        displayUsersFilterDialog()
+                        displayUsersFilterDialog(southWest,northEast)
                         //displayAllIcons(southWest = southWest, northEast = northEast)
                     }
                     .setNegativeButton("Arkadaşlarımın verileri") { _, _ ->
-                        openFriendsSelectionDialog()
+                        openFriendsSelectionDialog(southWest,northEast)
                     }
                     .show()
 
@@ -368,7 +370,7 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
             if (number != null && number in 1..30){
 
                 mMap.clear()
-                fetchFriendLocations(true,number,null)
+                fetchFriendLocations(number,null)
 
             }else{
                 Toast.makeText(requireContext(),"Invalid input!",Toast.LENGTH_LONG).show()
@@ -382,7 +384,7 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
         dialog.show()
     }
 
-    private fun openFriendsSelectionDialog() {
+    private fun openFriendsSelectionDialog(southWest: LatLng?=null,northEast: LatLng?=null) {
         val currentUserEmail = auth.currentUser!!.email.toString()
 
         firestore.collection("Users")
@@ -391,14 +393,14 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
             .get()
             .addOnSuccessListener { querySnapshot ->
                 val friendsList = querySnapshot.documents.map { it["email"] as String }
-                displayFriendsSelectionDialog(friendsList)
+                displayFriendsSelectionDialog(friendsList,southWest,northEast)
             }
             .addOnFailureListener { exception ->
                 Toast.makeText(requireContext(), "Failed to fetch friends: $exception", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun displayFriendsSelectionDialog(friendsList: List<String>) {
+    private fun displayFriendsSelectionDialog(friendsList: List<String>,southWest:LatLng?=null,northEast:LatLng?=null) {
         val selectedFriends = BooleanArray(friendsList.size)
         val friendsArray = friendsList.toTypedArray()
 
@@ -410,12 +412,12 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
             .setPositiveButton("OK") { _, _ ->
                 mMap.clear()
                 val selectedFriendsEmails = friendsList.filterIndexed { index, _ -> selectedFriends[index] }
-                displayFilterDialog(selectedFriendsEmails)
+                displayFilterDialog(selectedFriendsEmails,southWest,northEast)
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
-    private fun displayUsersFilterDialog() {
+    private fun displayUsersFilterDialog(southWest: LatLng?= null,northEast: LatLng? = null) {
         val filterOptions = arrayOf("Last 5 days", "Last 10 days", "Last 15 days", "All posts")
         var selectedOption = 0
 
@@ -431,18 +433,13 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
                     2 -> 15
                     else -> null
                 }
-                if (days == null){
-                    displayAllIcons(days)
-                }else{
-                    displayAllIcons(null,null,null,days)
-                }
-
+                displayAllIcons(null,southWest,northEast,days)
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
-    private fun displayFilterDialog(selectedFriends: List<String>) {
+    private fun displayFilterDialog(selectedFriends: List<String>,southWest: LatLng?= null,northEast: LatLng? = null) {
         val filterOptions = arrayOf("Last 5 days", "Last 10 days", "Last 15 days", "All posts")
         var selectedOption = 0
 
@@ -458,17 +455,25 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
                     2 -> 15
                     else -> null
                 }
-                if (days == null){
-                    fetchFriendLocations(false,days, selectedFriends)
-                }else{
-                    fetchFriendLocations(true,days, selectedFriends)
-                }
+
+                fetchFriendLocations(days, selectedFriends,southWest,northEast)
+
+
+
 
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
-
+    private suspend fun getBitmapDescriptorFromUrl(url: String, desiredSize: Int): BitmapDescriptor? {
+        return try {
+            val bitmap = Picasso.get().load(url).get()
+            val circularBitmap = getCircularBitmap(bitmap, desiredSize)
+            BitmapDescriptorFactory.fromBitmap(circularBitmap)
+        } catch (e: Exception) {
+            null
+        }
+    }
     private fun displayAllIcons(type: String? = null, southWest: LatLng? = null, northEast: LatLng? = null, days: Int? = null) {
         val ref = firestore.collection("Users").document(auth.currentUser!!.email.toString())
         ref.addSnapshotListener { value, error ->
@@ -532,19 +537,8 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
     }
 
 
-    private suspend fun getBitmapDescriptorFromUrl(url: String, desiredSize: Int): BitmapDescriptor? {
-        return try {
-            val bitmap = Picasso.get().load(url).get()
-            val circularBitmap = getCircularBitmap(bitmap, desiredSize)
-            BitmapDescriptorFactory.fromBitmap(circularBitmap)
-        } catch (e: Exception) {
-            null
-        }
-    }
 
-
-
-    private fun fetchFriendLocations(filter: Boolean, days: Int?, selectedFriendsEmails: List<String>?) {
+    private fun fetchFriendLocations( days: Int?, selectedFriendsEmails: List<String>?, southWest: LatLng? = null, northEast: LatLng? = null) {
         val userRef = firestore.collection("Users")
         userRef.document(auth.currentUser!!.email.toString()).collection("Friends").get()
             .addOnSuccessListener { friends ->
@@ -566,12 +560,28 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
                                                         val query = userRef.document(friendEmail).collection(collection.toString()).whereGreaterThanOrEqualTo("date",startDate.time)
                                                         query.get().addOnSuccessListener { snapshot->
                                                             for (doc in snapshot) {
+                                                                // Check if this location is within the selected area
+                                                                val latitude = doc.get("latitude") as Double
+                                                                val longitude = doc.get("longitude") as Double
+                                                                if (southWest != null && northEast != null) {
+                                                                    if (latitude !in southWest.latitude..northEast.latitude || longitude !in southWest.longitude..northEast.longitude) {
+                                                                        continue
+                                                                    }
+                                                                }
                                                                 addMarker(doc, friendEmail)
                                                             }
                                                         }
                                                     } else {
                                                         userRef.document(friendEmail).collection(collection.toString()).get().addOnSuccessListener { snapshot->
                                                             for (doc in snapshot) {
+                                                                // Check if this location is within the selected area
+                                                                val latitude = doc.get("latitude") as Double
+                                                                val longitude = doc.get("longitude") as Double
+                                                                if (southWest != null && northEast != null) {
+                                                                    if (latitude !in southWest.latitude..northEast.latitude || longitude !in southWest.longitude..northEast.longitude) {
+                                                                        continue
+                                                                    }
+                                                                }
                                                                 addMarker(doc, friendEmail)
                                                             }
                                                         }
@@ -840,7 +850,9 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
 
     override fun onMapLongClick(p0: LatLng) {
 
-        mMap.addMarker(MarkerOptions().position(p0))
+        val marker = mMap.addMarker(MarkerOptions().position(p0))
+        normalMarkers.add(marker!!)
+
 
         selectedLatitude = p0.latitude
         selectedLongitude = p0.longitude
@@ -895,6 +907,7 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
                         }
                         alert(place, selectedLatitude!!, selectedLongitude!!)
 
+
                     }.addOnFailureListener {
                         Toast.makeText(requireContext(),"Failed to retrieve current place: ${it.message}",Toast.LENGTH_LONG).show()
                     }
@@ -929,7 +942,10 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
         alert.setNegativeButton("Cancel"){ p0, p1 ->
 
             p0.dismiss()
-            mMap.clear()
+            for (marker in normalMarkers){
+                marker.remove()
+            }
+
         }
         alert.setCancelable(true)
         alert.create()

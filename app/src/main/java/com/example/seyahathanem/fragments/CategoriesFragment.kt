@@ -26,7 +26,7 @@ class CategoriesFragment : Fragment() {
     private var _binding: FragmentCategoriesBinding? = null
     private val binding get() = _binding!!
     private lateinit var gridView: GridView
-    private var dataModalArrayList: ArrayList<DataModal> = ArrayList()
+    private lateinit var dataModalArrayList: ArrayList<DataModal>
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
     private lateinit var adapter : GridRVAdapter
@@ -49,7 +49,7 @@ class CategoriesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        dataModalArrayList = ArrayList()
         gridView = requireActivity().findViewById(R.id.idGRV)
         firestore = Firebase.firestore
         auth = Firebase.auth
@@ -108,6 +108,8 @@ class CategoriesFragment : Fragment() {
                                 data = DataModal(collection.toString(),R.drawable.categories_shop_icon)
                             }else if (collection.toString() == "Cars"){
                                 data = DataModal(collection.toString(),R.drawable.buggatti)
+                            }else if (collection.toString() == "Museums"){
+                                data = DataModal(collection.toString(),R.drawable.museum)
                             }
                             dataModalArrayList.add(data)
                         }

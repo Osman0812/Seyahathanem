@@ -90,6 +90,12 @@ class CategoryFragment : Fragment() {
             actionToAddPlaceFragment(it)
 
         }
+
+        binding.Museum.setOnClickListener {
+            categorySelect(binding.museumImage)
+            categoryName = binding.categoryNameMuseum.text.toString()
+            actionToAddPlaceFragment(it)
+        }
 /*
         binding.newCategory.setOnClickListener {
 
@@ -99,6 +105,7 @@ class CategoryFragment : Fragment() {
         }
 
  */
+
 
         binding.Cars.setOnClickListener {
 
