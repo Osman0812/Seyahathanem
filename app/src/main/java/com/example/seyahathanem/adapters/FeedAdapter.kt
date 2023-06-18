@@ -82,6 +82,8 @@ class FeedAdapter (private val recyclerView: RecyclerView,private val context: C
             val latitude = categoryList.get(position).latitude
             val longitude = categoryList.get(position).longitude
 
+
+
             val mapsFragment = MapsFragment.newInstance(latitude, longitude)
             (context as AppCompatActivity).supportFragmentManager.beginTransaction()
                 .replace(R.id.feedLayout,mapsFragment)

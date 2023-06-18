@@ -305,7 +305,7 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
 
     private fun showCategoryDialog() {
         // Define the categories
-        val categories = arrayOf("Restaurants", "Entertainment", "Shopping", "Cars")
+        val categories = arrayOf("Restaurants","Museums", "Entertainment", "Shopping", "Cars")
 
         // Create an AlertDialog Builder
         val builder = AlertDialog.Builder(requireContext())
@@ -331,7 +331,6 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
 
     @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        menu.clear()
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.maps_menu,menu)
     }
@@ -345,7 +344,6 @@ class MapsFragment : Fragment() , OnMapReadyCallback, OnMapLongClickListener {
         }
         if (item.itemId == R.id.spatial_query){
             mMap.clear()
-            binding.cancel.visibility = View.VISIBLE
             spatialQueryJob?.cancel()
             spatialQueryJob = CoroutineScope(Dispatchers.Main).launch {
                 spatialQuery()

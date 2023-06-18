@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
@@ -20,8 +21,11 @@ import com.example.mezunproject.R
 import com.example.mezunproject.databinding.FragmentSocialBinding
 import com.example.seyahathanem.adapters.SocialAdapter
 import com.example.seyahathanem.classes.ShareClass
+import com.google.android.libraries.places.ktx.api.model.addressComponent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -37,8 +41,9 @@ class SocialFragment : Fragment(){
     private lateinit var storage: FirebaseStorage
     private lateinit var usersAdapter : SocialAdapter
     private lateinit var usersList : ArrayList<ShareClass>
-    private var _binding: FragmentSocialBinding? = null
     lateinit var sharedPreferences: SharedPreferences
+    private var _binding: FragmentSocialBinding? = null
+
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,7 +73,7 @@ class SocialFragment : Fragment(){
         usersList.size
 
         binding.socialRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        usersAdapter = SocialAdapter(requireContext(),usersList)
+        usersAdapter = SocialAdapter(binding.socialRecyclerView,requireContext(),usersList)
         binding.socialRecyclerView.adapter = usersAdapter
 
 
@@ -77,8 +82,13 @@ class SocialFragment : Fragment(){
 
     }
 
+
+
+
+
     @SuppressLint("NotifyDataSetChanged")
     private fun getDataFromFirebase(){
+
 
 
         firestore.collection("Users").addSnapshotListener{value, error->
@@ -138,6 +148,7 @@ class SocialFragment : Fragment(){
         super.onCreateOptionsMenu(menu, inflater)
 
         inflater.inflate(R.menu.search_view,menu)
+        inflater.inflate(R.menu.social_menu,menu)
 
 
         val item = menu.findItem(R.id.action_search)
@@ -158,10 +169,24 @@ class SocialFragment : Fragment(){
 
     }
 
+    @Deprecated("Deprecated in Java")
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.friends){
+            usersList.clear()
+            //getFriendsFromFirebase()
+            val fragmentManager = requireActivity().supportFragmentManager
+            val fragmentTransaction = fragmentManager.beginTransaction()
+
+            fragmentTransaction.replace(R.id.frameLayout,FriendsFragment()).commit()
+
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     @SuppressLint("NotifyDataSetChanged")
     private fun searchUsers(query: String){
         val filteredList = usersList.filter { it.name.contains(query,ignoreCase = true) }
-        usersAdapter = SocialAdapter(requireContext(),filteredList as ArrayList<ShareClass>)
+        usersAdapter = SocialAdapter(binding.socialRecyclerView,requireContext(),filteredList as ArrayList<ShareClass>)
         binding.socialRecyclerView.adapter = usersAdapter
         usersAdapter.notifyDataSetChanged()
 
