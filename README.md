@@ -27,7 +27,9 @@ in which we will query our places.
 
 <img src = "Pics/Resim9.png" width = "150">
 
-Then, we just following the popup messages.
+Then, we just following the popup messages,final output looks like
+
+<img src = "Pics/Resim7.png" width = "150">
 
 
 The last Screen is the list of users, user can see their information if they shared it, send friend requests, and contact with them via Email
